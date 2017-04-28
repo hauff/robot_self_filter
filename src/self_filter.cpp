@@ -48,9 +48,12 @@ public:
 
   SelfFilter(void): nh_("~"), subscribing_(false)
   {
+    nh_.param<std::string>("topic_in", topic_in_, std::string());
+    nh_.param<std::string>("topic_out", topic_out_, std::string());
     nh_.param<std::string>("sensor_frame", sensor_frame_, std::string());
     nh_.param("use_rgb", use_rgb_, false);
     nh_.param("max_queue_size", max_queue_size_, 10);
+
     if (use_rgb_) 
     {
       self_filter_rgb_ = new filters::SelfFilter<pcl::PointXYZRGB>(nh_);
@@ -59,8 +62,8 @@ public:
     {
       self_filter_ = new filters::SelfFilter<pcl::PointXYZ>(nh_);
     }
-    ros::SubscriberStatusCallback connect_cb
-      = boost::bind( &SelfFilter::connectionCallback, this, _1);
+
+    ros::SubscriberStatusCallback connect_cb = boost::bind(&SelfFilter::connectionCallback, this, _1);
     
     if (use_rgb_) 
     {
@@ -70,8 +73,9 @@ public:
     {
       self_filter_->getSelfMask()->getLinkNames(frames_);
     }
-    pointCloudPublisher_ = root_handle_.advertise<sensor_msgs::PointCloud2>("cloud_out", 1,
-                                                                            connect_cb, connect_cb);
+
+    pointCloudPublisher_ = root_handle_.advertise<sensor_msgs::PointCloud2>(
+      topic_out_, 1, connect_cb, connect_cb);
   }
     
   ~SelfFilter(void)
@@ -104,32 +108,37 @@ private:
     }
   }
   
-  void subscribe() {
-    if(frames_.empty())
+  void subscribe()
+  {
+    if (frames_.empty())
     {
       ROS_DEBUG("No valid frames have been passed into the self filter. Using a callback that will just forward scans on.");
-      no_filter_sub_ = root_handle_.subscribe<sensor_msgs::PointCloud2>("cloud_in", 1, boost::bind(&SelfFilter::noFilterCallback, this, _1));
+      no_filter_sub_ = root_handle_.subscribe<sensor_msgs::PointCloud2>(topic_in_, 1, boost::bind(&SelfFilter::noFilterCallback, this, _1));
     }
     else
     {
       ROS_DEBUG("Valid frames were passed in. We'll filter them.");
-      sub_.subscribe(root_handle_, "cloud_in", max_queue_size_);
+      sub_.subscribe(root_handle_, topic_in_, max_queue_size_);
       mn_.reset(new tf::MessageFilter<sensor_msgs::PointCloud2>(sub_, tf_, "", max_queue_size_));
       mn_->setTargetFrames(frames_);
       mn_->registerCallback(boost::bind(&SelfFilter::cloudCallback, this, _1));
     }
   }
 
-  void unsubscribe() {
-    if (frames_.empty()) {
+  void unsubscribe()
+  {
+    if (frames_.empty())
+    {
       no_filter_sub_.shutdown();
     }
-    else {
+    else
+    {
       sub_.unsubscribe();
     }
   }
 
-  void noFilterCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud){
+  void noFilterCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud)
+  {
     pointCloudPublisher_.publish(cloud);
     ROS_DEBUG("Self filter publishing unfiltered frame");
   }
@@ -140,7 +149,6 @@ private:
     std::vector<int> mask;
     ros::WallTime tm = ros::WallTime::now();
 
-    
     sensor_msgs::PointCloud2 out2;
     int input_size = 0;
     int output_size = 0;
@@ -169,26 +177,26 @@ private:
       
     double sec = (ros::WallTime::now() - tm).toSec();
     pointCloudPublisher_.publish(out2);
-    ROS_DEBUG("Self filter: reduced %d points to %d points in %f seconds", input_size, output_size, sec);
+    ROS_INFO("Self filter: reduced %d points to %d points in %f seconds", input_size, output_size, sec);
 
   }
   
-  tf::TransformListener                                 tf_;
-  //tf::MessageNotifier<robot_self_filter::PointCloud>           *mn_;
-  ros::NodeHandle                                       nh_, root_handle_;
+  tf::TransformListener tf_;
+  //tf::MessageNotifier<robot_self_filter::PointCloud> *mn_;
+  ros::NodeHandle nh_, root_handle_;
 
-  boost::shared_ptr<tf::MessageFilter<sensor_msgs::PointCloud2> >          mn_;
+  boost::shared_ptr<tf::MessageFilter<sensor_msgs::PointCloud2> > mn_;
   message_filters::Subscriber<sensor_msgs::PointCloud2> sub_;
 
   filters::SelfFilter<pcl::PointXYZ> *self_filter_;
   filters::SelfFilter<pcl::PointXYZRGB> *self_filter_rgb_;
-  std::string sensor_frame_;
+  std::string topic_in_, topic_out_, sensor_frame_;
   bool use_rgb_;
   bool subscribing_;
   std::vector<std::string> frames_;
   
-  ros::Publisher                                        pointCloudPublisher_;
-  ros::Subscriber                                       no_filter_sub_;
+  ros::Publisher pointCloudPublisher_;
+  ros::Subscriber no_filter_sub_;
   int max_queue_size_;
 };
 }

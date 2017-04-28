@@ -58,10 +58,12 @@ public:
     std::vector<robot_self_filter::LinkInfo> links;	
     std::string link_names;
     
-    if(!nh_.hasParam("self_see_links")) {
+    if (!nh_.hasParam("self_see_links"))
+    {
       ROS_WARN("No links specified for self filtering.");
-    } else {     
-
+    }
+    else
+    {     
       XmlRpc::XmlRpcValue ssl_vals;;
       
       nh_.getParam("self_see_links", ssl_vals);
@@ -138,9 +140,12 @@ public:
   virtual bool update(const PointCloud& data_in, PointCloud& data_out)
   {
     std::vector<int> keep(data_in.points.size());
-    if(sensor_frame_.empty()) {
+    if (sensor_frame_.empty())
+    {
       sm_->maskContainment(data_in, keep);
-    } else {
+    }
+    else
+    {
       sm_->maskIntersection(data_in, sensor_frame_, min_sensor_dist_, keep);
     }	
     fillResult(data_in, keep, data_out);
@@ -160,9 +165,12 @@ public:
   virtual bool update(const PointCloud& data_in, PointCloud& data_out, PointCloud& data_diff)
   {
     std::vector<int> keep(data_in.points.size());
-    if(sensor_frame_.empty()) {
+    if (sensor_frame_.empty())
+    {
       sm_->maskContainment(data_in, keep);
-    } else {
+    }
+    else
+    {
       sm_->maskIntersection(data_in, sensor_frame_, min_sensor_dist_, keep);
     }
     fillResult(data_in, keep, data_out);
@@ -213,7 +221,8 @@ public:
         data_out.points.push_back(nan_point);
       }
     }
-    if (keep_organized_) {
+    if (keep_organized_)
+    {
       data_out.width = data_in.width;
       data_out.height = data_in.height;
     }
