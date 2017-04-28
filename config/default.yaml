@@ -1,6 +1,6 @@
 self_filter:
-  topic_in: head_mount_kinect/depth_registered/points
-  topic_out: cloud_out
+  topic_in: kinect2/qhd/points
+  topic_out: filtered_cloud
   use_rgb: true
   keep_organized: true
 
