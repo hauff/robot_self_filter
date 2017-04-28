@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <rosparam command="load" file="$(find robot_self_filter)config/default.yaml"/>
+
+  <node pkg="robot_self_filter" type="self_filter" name="self_filter" output="screen">
+    <rosparam subst_value="True"></rosparam>
+  </node>
+
+</launch>
