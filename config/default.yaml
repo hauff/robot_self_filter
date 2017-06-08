@@ -23,7 +23,7 @@ self_filter:
     name: r_upper_arm_roll_link,
     name: r_wrist_flex_link,
     name: r_wrist_roll_link,
-		name: l_elbow_flex_link,
+    name: l_elbow_flex_link,
     name: l_forearm_link,
     name: l_forearm_roll_link,
     name: l_gripper_l_finger_link,
