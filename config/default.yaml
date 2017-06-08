@@ -3,7 +3,7 @@ self_filter:
   topic_out: filtered_cloud
   use_rgb: true
   keep_organized: true
-
+  self_see_default_padding: 0.07
   self_see_links: [
     name: r_elbow_flex_link,
     name: r_forearm_link,
@@ -22,4 +22,22 @@ self_filter:
     name: r_upper_arm_link,
     name: r_upper_arm_roll_link,
     name: r_wrist_flex_link,
-    name: r_wrist_roll_link]
+    name: r_wrist_roll_link,
+		name: l_elbow_flex_link,
+    name: l_forearm_link,
+    name: l_forearm_roll_link,
+    name: l_gripper_l_finger_link,
+    name: l_gripper_l_finger_tip_link,
+    #name: l_gripper_motor_accelerometer_link,
+    #name: l_gripper_motor_screw_link,
+    #name: l_gripper_motor_slider_link,
+    name: l_gripper_palm_link,
+    name: l_gripper_r_finger_link,
+    name: l_gripper_r_finger_tip_link,
+    name: l_shoulder_lift_link,
+    name: l_shoulder_pan_link,
+    #name: l_torso_lift_side_plate_link,
+    name: l_upper_arm_link,
+    name: l_upper_arm_roll_link,
+    name: l_wrist_flex_link,
+    name: l_wrist_roll_link]
